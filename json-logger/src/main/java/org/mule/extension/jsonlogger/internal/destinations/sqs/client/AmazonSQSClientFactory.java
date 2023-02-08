@@ -1,3 +1,5 @@
+package org.mule.extension.jsonlogger.internal.destinations.sqs.client;
+
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -20,7 +22,7 @@ public class AmazonSQSClientFactory {
         this.endpoint = endpoint;
     }
 
-    public AmazonSQSClient createClient() {
+    public AmazonSQS createClient() {
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(credentials);
         return AmazonSQSClientBuilder.standard()

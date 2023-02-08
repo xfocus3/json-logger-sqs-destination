@@ -1,4 +1,26 @@
-# Json-logger Extension
+# JSON Logger Extension with SQS Destination
+
+This extension provides the ability to log messages in JSON format and send them to a designated Amazon Simple Queue Service (SQS) queue.
+
+#Prerequisites
+    A Mule 4.x runtime
+    An Amazon Web Services (AWS) account and access to the AWS Management Console
+    A created SQS queue in the AWS Management Console
+#Features
+
+## Installation
+* Clone or download the code from this repository
+* Import the code into your Mule project as a Mule plugin
+* Add the following dependency to your pom.xml file:
+    
+    ```<dependency><groupId>com.amazonaws</groupId><artifactId>aws-java-sdk-sqs</artifactId><version>1.11.xxx</version></dependency>```
+    
+    where xxx is the latest version of the AWS SDK for Java. For more information, see the [AWS SDK for Java documentation](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-project-maven.html).
+* 
+## 2.2.0 version - Release notes
+* Logs messages in JSON format
+* Sends messages to a designated SQS queue
+* Supports logging to private SQS queues
 
 ## 2.1.0 version - Release notes
 
@@ -34,3 +56,6 @@ Improvements:
 * Minimized dependency footprint (down from ~23MB to ~13MB)
 * Optimized parsing of TypedValue content fields
 
+#License
+
+This project is licensed under the Apache 2.0 License.

@@ -1,8 +1,8 @@
 package org.mule.extension.jsonlogger.internal.destinations.sqs;
 
 import org.mule.extension.jsonlogger.internal.destinations.Destination;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.extension.jsonlogger.internal.destinations.sqs.client.AmazonSQSClientFactory;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
@@ -10,35 +10,43 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
+import org.mule.runtime.extension.api.annotation.param.reference.ConfigReference;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class AmazonSQSDestination implements Destination{
 
+
     @Parameter
+    @ConfigReference(namespace = "SQS", name = "CONFIG")
     @DisplayName("Queue URL")
     @Summary("The URL of the SQS queue to send messages to")
-    private String queueUrl;
+    private String queueUrl = "";
 
     @Parameter
+    @ConfigReference(namespace = "SQS", name = "CONFIG")
     @DisplayName("AWS Access Key")
     @Summary("The AWS Access Key used to authenticate to the SQS service")
-    private String accessKey;
+    private String accessKey="";
 
     @Parameter
+    @ConfigReference(namespace = "SQS", name = "CONFIG")
     @DisplayName("AWS Secret Key")
     @Summary("The AWS Secret Key used to authenticate to the SQS service")
-    private String secretKey;
+    private String secretKey="";
 
     @Parameter
+    @ConfigReference(namespace = "SQS", name = "CONFIG")
+    @Optional
     @DisplayName("Region")
     @Summary("The region of the SQS service")
     private String region;
 
-    @Parameter
-    @Optional(defaultValue = "sqs")
-    @Summary("The name of the destination")
-    private String name;
+
+    private AmazonSQSClientFactory clientFactory;
+    private AmazonSQS sqsClient;
+    private List<String> logs = new ArrayList<>();
 
     @Parameter
     @Optional
@@ -53,10 +61,6 @@ public class AmazonSQSDestination implements Destination{
     @DisplayName("Max Batch Size")
     private int maxBatchSize;
 
-    private AmazonSQSClientFactory clientFactory;
-    private AmazonSQS sqsClient;
-    private List<String> logs = new ArrayList<>();
-
     @Override
     public int getMaxBatchSize() {
         return this.maxBatchSize;
@@ -64,7 +68,7 @@ public class AmazonSQSDestination implements Destination{
 
     @Override
     public String getSelectedDestinationType() {
-        return "SQS";
+        return "JMS";
     }
 
     @Override
@@ -73,20 +77,19 @@ public class AmazonSQSDestination implements Destination{
     }
 
     @Override
-    public void initialise() throws ConnectionException {
-        clientFactory = new AmazonSQSClientFactory(accessKey, secretKey, region);
+    public void initialise() {
+        clientFactory = new AmazonSQSClientFactory(accessKey, secretKey, "eu-central-1",queueUrl);
         sqsClient = clientFactory.createClient();
     }
 
     @Override
-    public void sendToExternalDestination(String log) throws Exception {
+    public void sendToExternalDestination(String log) {
         logs.add(log);
         if (logs.size() >= maxBatchSize) {
             flushLogs();
         }
     }
 
-    @Override
     private void flushLogs() {
         SendMessageRequest sendMessageRequest = new SendMessageRequest(queueUrl, logs.toString());
         sqsClient.sendMessage(sendMessageRequest);
@@ -95,8 +98,7 @@ public class AmazonSQSDestination implements Destination{
 
     @Override
     public void dispose() {
-        this.sqsClient.stop();
-        this.sqsClient.dispose();
+        this.sqsClient.shutdown();
     }
 
 }
