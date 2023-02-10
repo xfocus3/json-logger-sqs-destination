@@ -46,13 +46,3 @@ PS2. For EU Control Plane deployment you have to modify the `<distributionManage
     </repository>
 </distributionManagement>
 ```
-
-##  Release notes [HERE](https://github.com/mulesoft-consulting/json-logger/blob/mule-4.x/json-logger/README.md)
-
-## Author
-
-* **Andres Ramirez** [Slack: @andres.ramirez / Email: andres.ramirez@mulesoft.com]
-
-## Support disclaimer
-
-In case you haven't noticed the type of license for the source code, this is provided as a side project under MIT open source license which means it won't be officially supported by MuleSoft as it is considered a custom connector. 
